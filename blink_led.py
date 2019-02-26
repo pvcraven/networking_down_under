@@ -5,27 +5,35 @@ import time
 # (GPIO) pins.
 import RPi.GPIO as GPIO
 
+# Use a constant for our channel. Replace this
+# if you want a different pin.
+GPIO_CHANNEL = 17
+
+# Use a constant for how many seconds to wait.
+# You can use 0.5 if you want a half second
+DELAY_TIME = 1
+
 # State how we will specify our pin numbers.
 # For a more detailed explanation, see here:
 # http://www.raspberrypi-spy.co.uk/2012/06/simple-guide-to-the-rpi-gpio-header-and-pins/
 GPIO.setmode(GPIO.BCM)
 
 # Say we will be outputting on pin 17:
-GPIO.setup(17, GPIO.OUT)
+GPIO.setup(GPIO_CHANNEL, GPIO.OUT)
 
 # Loop forever
 while True:
 
     # Set pin 17 high. (Turn it on.)
-    GPIO.output(17, GPIO.HIGH)
+    GPIO.output(GPIO_CHANNEL, GPIO.HIGH)
     print("LED On")
 
     # Wait for a second
-    time.sleep(1)
+    time.sleep(DELAY_TIME)
 
     # Set it low. (Turn it off.)
-    GPIO.output(17, GPIO.LOW)
+    GPIO.output(GPIO_CHANNEL, GPIO.LOW)
     print("LED Off")
 
     # Wait for a second
-    time.sleep(1)
+    time.sleep(DELAY_TIME)
