@@ -12,9 +12,13 @@ site_list = ["google.com",
 # Max number of hops to trace
 time_to_live = 30
 
-# This creates the trace
+# This creates the trace using TCP packets
 # and outputs the text result to the screen
 res, unans = traceroute(site_list, maxttl=time_to_live)
+
+# Alternatively, if TCP doesn't work well, try
+# using ICMP packets.
+# res, unans = traceroute(site_list, maxttl=time_to_live, l4=ICMP())
 
 # Create a graph in SVG format
 res.graph(target="> traceroute_scapy.svg", type="svg")
