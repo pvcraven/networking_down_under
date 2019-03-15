@@ -1,7 +1,7 @@
 import socket
 
 # IP address and port of where we'll send the message.
-server_ip_address = '10.1.23.175'
+server_ip_address = '127.0.0.1'
 server_ip_port = 10000
 
 def send_data(total_bytes, message_size_in_bytes):
@@ -38,15 +38,14 @@ def send_data(total_bytes, message_size_in_bytes):
     print("Done")
 
 def main():
-    """
-    Main program.
-    """
+    """ Main program. """
+
     # How many bytes to send
-    total_bytes = 50000000
+    total_bytes = 500000
 
     # How big each message will be
-    message_size_in_bytes = 50
-
+    message_size_in_bytes = 2
+    print(f"Sending {total_bytes:,} bytes in {message_size_in_bytes} byte chunks.")
     send_data(total_bytes, message_size_in_bytes)
 
 main()
