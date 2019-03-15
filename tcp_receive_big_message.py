@@ -1,11 +1,26 @@
 import socket
+import time
 
+# This is your buffer size.
+# You can't receive anything more than the buffer size at one time.
 BUFFER_SIZE = 65535
 
+# This should be the IP address of the computer you run this
+# code on (the server). It should be the SAME IP address that
+# the client hooks up to.
+# Note: If you use '127.0.0.1' you can only receive connections
+# from the same computer. Outside computers cannot connect to a
+# computer listening to 127.0.0.1.
 my_ip_address = '127.0.0.1'
 my_ip_port = 10000
 
-# Our full message
+# We will loop until we get a connection or we get data. We don't want
+# to check thousands of times per second for these because that would
+# max our CPU. If we have nothing to do, how long we wait before we
+# check again.
+DELAY = 0.1
+
+# Our full message. Starts empty.
 full_message = b""
 
 # We need to build a "state machine" that keeps
@@ -22,7 +37,9 @@ my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 my_socket.settimeout(0.0)
 
 # Tell the socket it will be listening on my_ip_address, and my_port.
-my_socket.bind((my_ip_address, my_ip_port))
+# Note that Python expects ip and port as a list
+listen_to = (my_ip_address, my_ip_port)
+my_socket.bind(listen_to)
 
 # We are going to be listening as a server, not connecting as a client.
 # The "1" specifies the size of the backlog of connections we allow before
@@ -31,6 +48,9 @@ my_socket.listen(1)
 
 done = False
 chunks = 0
+connection = None
+client_ip = None
+client_port = None
 
 while not done:
 
@@ -40,6 +60,8 @@ while not done:
             # Get a connection, and the address that hooked up to us.
             # The 'client address' is an array that has the IP and the port.
             connection, client_address = my_socket.accept()
+            client_ip = client_address[0]
+            client_port = client_address[1]
             state = CONNECTED
         except BlockingIOError:
             pass
@@ -52,7 +74,7 @@ while not done:
             chunks += 1
 
             if len(data) > 0:
-                print("Data from {}:{} \"{}\"".format(client_address[0], client_address[1], data))
+                print(f"Data from {client_ip}:{client_port} '{data}'")
 
             # Append this chunk to the full message
             full_message += data
@@ -70,4 +92,5 @@ while not done:
 # Close the socket. No socket operations can happen after this.
 my_socket.close()
 
-print("Done receiving message. Processed {} bytes in {} chunks.".format(len(full_message), chunks))
+print(f"Done receiving message.")
+print(f"Processed {len(full_message)} bytes in {chunks} chunks.")
