@@ -162,7 +162,7 @@ class MyGame(arcade.Window):
         # Use receive_ball method and left_socket to see if there's a ball
         # If we do, add them to the ball list
         # Set the center to 0
-        # Check for a y that is out of bounce and pull it in-bounds
+        # Check for a y that is out of bounds and if it is, reverse course
         # Note that you can check self.height to get height of window
 
         # Todo: Same thing from the right
