@@ -16,21 +16,24 @@ public class ReceiveMultipleMessages {
 
     public static void handleConnection() throws Exception {
         // Selector: multiplexor of SelectableChannel objects
-        Selector selector = Selector.open(); // selector is open here
+        Selector channelSelector = Selector.open(); // selector is open here
 
         // ServerSocketChannel: selectable channel for stream-oriented listening sockets
-        ServerSocketChannel mySocket = ServerSocketChannel.open();
+        ServerSocketChannel myServerSocketChannel = ServerSocketChannel.open();
         InetSocketAddress myAddress = new InetSocketAddress("127.0.0.1", 10000);
 
         // Binds the channel's socket to a local address and configures the socket to listen for connections
-        mySocket.bind(myAddress);
+        myServerSocketChannel.bind(myAddress);
 
         // Adjusts this channel's blocking mode.
-        mySocket.configureBlocking(false);
+        myServerSocketChannel.configureBlocking(false);
 
-        int ops = mySocket.validOps();
-        SelectionKey selectKy = mySocket.register(selector, ops, null);
+        // Used as a 'state machine' for figuring if socket is waiting for a connection,
+        // or if we have a connection and instead should be receiving data
+        int ops = myServerSocketChannel.validOps();
+        SelectionKey selectKy = myServerSocketChannel.register(channelSelector, ops, null);
 
+        // Create variables for receiving the message and keeping stats
         String fullMessage = "";
         boolean done = false;
         int chunks = 0;
@@ -42,10 +45,15 @@ public class ReceiveMultipleMessages {
         while(!done) {
 
             // Selects a set of keys whose corresponding channels are ready for I/O operations
-            selector.select();
+            // For blocking I/O use a select with no data:
+            // channelSelector.select(10);
+            // For non-blocking, use a select with a number in ms to wait. (Using zero will chew a lot
+            // of CPU unless something else in the loop waits.)
+            // channelSelector.select(0);
+            channelSelector.select(0);
 
-            // token representing the registration of a SelectableChannel with a Selector
-            Set<SelectionKey> myKeys = selector.selectedKeys();
+            // Token representing the registration of a SelectableChannel with a Selector
+            Set<SelectionKey> myKeys = channelSelector.selectedKeys();
             Iterator<SelectionKey> keyIterator = myKeys.iterator();
 
             while (keyIterator.hasNext()) {
@@ -53,13 +61,13 @@ public class ReceiveMultipleMessages {
 
                 // Tests whether this key's channel is ready to accept a new socket connection
                 if (myKey.isAcceptable()) {
-                    SocketChannel myClient = mySocket.accept();
+                    SocketChannel myClient = myServerSocketChannel.accept();
 
                     // Adjusts this channel's blocking mode to false
                     myClient.configureBlocking(false);
 
                     // Operation-set bit for read operations
-                    myClient.register(selector, SelectionKey.OP_READ);
+                    myClient.register(channelSelector, SelectionKey.OP_READ);
                     System.out.println("Connection Accepted: " + myClient.getLocalAddress());
 
                     // Tests whether this key's channel is ready for reading
@@ -76,8 +84,8 @@ public class ReceiveMultipleMessages {
 
                     if (result.endsWith("Z")) {
                         myClient.close();
-                        mySocket.close();
-                        selector.close();
+                        myServerSocketChannel.close();
+                        channelSelector.close();
                         done = true;
                         System.out.println("It's time to close connection as we got a Z");
                         endTime = System.currentTimeMillis();
