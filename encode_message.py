@@ -11,7 +11,7 @@ SLEEP_TIME = 0.1
 GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(CLOCK_LINE_PIN, GPIO.OUT)
-GPIO.setup(18, GPIO.OUT)
+GPIO.setup(DATA_LINE_PIN, GPIO.OUT)
 
 # Set up data
 done = False
@@ -20,6 +20,9 @@ my_message = b'Hello World'
 
 # Loop through each byte of our message
 for my_byte in my_message:
+
+    print()
+    print(my_byte, end=" - ")
 
     # Loop for each bit of the byte
     for bit_pos in range(bits_in_a_byte):
@@ -32,11 +35,11 @@ for my_byte in my_message:
         if bit != 0:
             # There was a value
             bit_value = 1
-            print(bit_value)
         else:
             # There was not a value
             bit_value = 0
-            print(bit_value)
+
+        print(bit_value, end="")
 
         # Turn the clock line on
         GPIO.output(CLOCK_LINE_PIN, GPIO.HIGH)
@@ -56,3 +59,6 @@ for my_byte in my_message:
 
         # Wait
         time.sleep(SLEEP_TIME)
+
+# Reset the pins
+GPIO.cleanup()
