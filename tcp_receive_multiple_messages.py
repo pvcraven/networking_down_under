@@ -64,7 +64,8 @@ class MyConnectionHandler:
                     print("Connected, receiving data...")
 
                     # Start timing how long this takes.
-                    start = timer()
+                    if len(full_message) == 0:
+                        start_time = timer()
 
                 except BlockingIOError:
                     pass
@@ -79,17 +80,22 @@ class MyConnectionHandler:
                     # Append this chunk to the full message
                     full_message += data
 
-                    # Check for a Y instead of an X. This means that we have the
-                    # last packet, and we are done.
-                    if full_message[-2] == 89:
-
-                        # Stop timing how long this takes.
-                        total_time = timer() - start
-
+                    # See if last letter is Z or Y. If so, close socket.
+                    last_letter = full_message[-1]
+                    if last_letter == 90 or last_letter == 89:
                         # Close the socket. No socket operations can happen after this.
                         self.state = NO_CONNECTION
                         connection.close()
-                        done = True
+                        print(f"Closing connection, total of {len(full_message)} bytes received.")
+
+                        # Check for a Z instead of an X. This means that we have the
+                        # last packet, and we are done.
+                        if last_letter == 90:
+
+                            # Stop timing how long this takes.
+                            total_time = timer() - start_time
+                            done = True
+                            print("Done receiving data")
 
                 except BlockingIOError:
                     pass

@@ -4,8 +4,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ReceiveData {
-
+public class ReceiveDataBlocking {
     public static void main(String[] args) throws Exception {
         // Set up the socket
         int port = 10000;
