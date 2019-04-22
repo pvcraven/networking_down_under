@@ -21,8 +21,8 @@ my_message = b'Hello World'
 # Loop through each byte of our message
 for my_byte in my_message:
 
-    print()
-    print(my_byte, end=" - ")
+    # Show what we are encoding
+    print("{} = {:3} = ".format(chr(my_byte), my_byte), end=" - ")
 
     # Loop for each bit of the byte
     for bit_pos in range(bits_in_a_byte):
@@ -59,6 +59,8 @@ for my_byte in my_message:
 
         # Wait
         time.sleep(SLEEP_TIME)
+
+    print()
 
 # Reset the pins
 GPIO.cleanup()
