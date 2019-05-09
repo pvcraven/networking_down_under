@@ -13,16 +13,16 @@ def data_callback(channel):
 
     # Get data line value
     data_line = GPIO.input(GPIO_DATA_IN)
-    
+
     # Get time interval
     cur_time = time.time()
     time_interval = cur_time - data_callback.last_call
 
-    if data_line:
-        dl = "L->H"
-    else:
-        dl = "H->L"
-    print("  Change: {} Interval: {:.3f}".format(dl, time_interval))
+    # if data_line:
+    #     dl = "L->H"
+    # else:
+    #     dl = "H->L"
+    # print("  Change: {} Interval: {:.3f}".format(dl, time_interval))
 
     # If the interval is greater than three clock cycles, this must be a new message
     if time_interval > CLOCK_SPEED * 3:
@@ -32,11 +32,11 @@ def data_callback(channel):
     elif time_interval > CLOCK_SPEED + CLOCK_SPEED / 2 or data_callback.data_bit:
         data_callback.data_bit = False
         if data_line != 0:
-            print(" Bit {} is 1".format(data_callback.bit_count))
+            # print(" Bit {} is 1".format(data_callback.bit_count))
             data_callback.my_byte += 1 << data_callback.bit_count
-        else:
-            print(" Bit {} is 0".format(data_callback.bit_count))
-            
+        # else:
+        #     print(" Bit {} is 0".format(data_callback.bit_count))
+
         data_callback.bit_count -= 1
         if data_callback.bit_count == -1:
             my_char = chr(data_callback.my_byte)
