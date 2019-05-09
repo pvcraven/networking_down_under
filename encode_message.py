@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 
 # Constants
 CLOCK_LINE_PIN = 17
-DATA_LINE_PIN = 18
+DATA_LINE_PIN = 12
 SLEEP_TIME = 0.1
 
 # Set up our GPIO pins
@@ -24,8 +24,9 @@ for my_byte in my_message:
     # Show what we are encoding
     print("{} = {:3} = ".format(chr(my_byte), my_byte), end="")
 
-    # Loop for each bit of the byte
-    for bit_pos in range(bits_in_a_byte):
+    # Loop for each bit of the byte, starting with the most
+    # significant bit 7, down to 0.
+    for bit_pos in range(bits_in_a_byte - 1, -1, -1):
 
         # Use a single 1, and bit shift it with << to the
         # spot we are interested in. Then use a bitwise

@@ -13,12 +13,12 @@ number_to_encode = 23
 # Loop for each bit
 for bit_pos in range(bits_to_encode):
 
-	# Use a single 1, and bit shift it with << to the
-	# spot we are interested in.
-	bit = (1 << bit_pos) & number_to_encode
-	if bit != 0:
-		bit_value = 1
-	else:
-		bit_value = 0
+    # Use a single 1, and bit shift it with << to the
+    # spot we are interested in.
+    bit = (1 << bit_pos) & number_to_encode
+    if bit != 0:
+        bit_value = 1
+    else:
+        bit_value = 0
 
-	print("Bit position {:2} is {} which is worth {:2}".format(bit_pos, bit_value, bit))
+    print("Bit position {:2} is {} which is worth {:2}".format(bit_pos, bit_value, bit))
