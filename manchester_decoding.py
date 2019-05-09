@@ -1,7 +1,12 @@
+"""
+Manchester Decoding
+
+Receives a message sent by Manchester Encoding
+"""
 import time
 import RPi.GPIO as GPIO
 
-DATA_IN = 21
+DATA_IN = 13
 CLOCK_SPEED = .005
 
 def data_callback(channel):
@@ -11,12 +16,11 @@ def data_callback(channel):
     if time_interval > CLOCK_SPEED + CLOCK_SPEED / 2:
         data_bit = False
 
-
     if time_interval > CLOCK_SPEED + CLOCK_SPEED / 2 or data_bit:
         if GPIO.input(channel):
 
             bit = GPIO.input(channel)
-            my_bit = (1 << data_callback.numberOfBits)
+            my_bit = 1 << (7 - data_callback.numberOfBits)
             data_callback.result_byte += my_bit
 
             print("1", end='')
@@ -45,6 +49,7 @@ GPIO.setup(DATA_IN, GPIO.IN)
 
 GPIO.add_event_detect(DATA_IN, GPIO.BOTH, callback=data_callback)
 
+print("Running")
 while True:
     time.sleep(10)
 
