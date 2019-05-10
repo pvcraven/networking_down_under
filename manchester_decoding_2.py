@@ -18,10 +18,7 @@ def data_callback(channel):
     cur_time = time.time()
     time_interval = cur_time - data_callback.last_call
 
-    if data_line:
-        dl = "L->H"
-    else:
-        dl = "H->L"
+    dl = "L->H" if data_line else "H->L"
     print("  Change: {} Interval: {:.3f}".format(dl, time_interval))
 
     if time_interval > CLOCK_SPEED + CLOCK_SPEED / 2:
@@ -36,7 +33,6 @@ data_callback.last_call = time.time()
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(GPIO_DATA_IN, GPIO.IN)
-
 GPIO.add_event_detect(GPIO_DATA_IN, GPIO.BOTH, callback=data_callback)
 
 print("Running")
