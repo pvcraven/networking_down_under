@@ -13,15 +13,16 @@ def data_callback(channel):
 
     # Get data line value
     data_line = GPIO.input(GPIO_DATA_IN)
-    
+
     # Get time interval
     cur_time = time.time()
     time_interval = cur_time - data_callback.last_call
 
-    if data_line == 0:
-        print("high->low: {:.3f}".format(time_interval))
+    if data_line:
+        dl = "L->H"
     else:
-        print("low->high: {:.3f}".format(time_interval))
+        dl = "H->L"
+    print("  Change: {} Interval: {:.3f}".format(dl, time_interval))
 
     data_callback.last_call = cur_time
 

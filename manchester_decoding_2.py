@@ -13,10 +13,16 @@ def data_callback(channel):
 
     # Get data line value
     data_line = GPIO.input(GPIO_DATA_IN)
-    
+
     # Get time interval
     cur_time = time.time()
     time_interval = cur_time - data_callback.last_call
+
+    if data_line:
+        dl = "L->H"
+    else:
+        dl = "H->L"
+    print("  Change: {} Interval: {:.3f}".format(dl, time_interval))
 
     if time_interval > CLOCK_SPEED + CLOCK_SPEED / 2:
         if data_line == 0:
