@@ -1,2 +1,4 @@
 .idea/
 *.class
+*.sublime-project
+*.sublime-workspace
