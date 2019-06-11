@@ -48,8 +48,8 @@ letter = """
     #
   ## 
     #
-    #
-#### 
+#   #
+ ### 
 """
 letters.append(letter.split("\n"))
 
