@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <style>
+#head {
+  offset-path: path('M10 80 Q 77.5 10, 145 80 T 280 80');
+  offset-distance: 0%;
+
+  animation: my-curve 2s linear alternate infinite;
+}
+@keyframes my-curve {
+    from {
+        offset-distance: 0%;
+    }
+    to {
+        offset-distance: 100%;
+    }
+}
+        </style>
     </head>
     <body>
         <svg width="500" height="500">
 
-            <line x1="0" y1="80" x2="270" y2="80"
-                  style="stroke:rgb(255,128,0);stroke-width:2" />
-            <text x="10" y="110" style="font: bold 30px Serif">My SVG Image</text>
+            <path d='M10 80 Q 77.5 10, 145 80 T 280 80'
+            style="fill:None;stroke-width:3;stroke:#000000"/>
 
-            <g id="head" transform="translate(50 50)">
+            <g id="head" transform="translate(0 0)">
                 <ellipse cx="0" cy="0" rx="35" ry="30"
                         style="fill:#FDE6C4;stroke-width:3;stroke:#DF875C"/>
 
