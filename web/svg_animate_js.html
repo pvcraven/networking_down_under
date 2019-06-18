@@ -18,25 +18,7 @@
         </svg>
 
         <script>
-var x=80;
-var y=80;
-var cx = .5;
-var cy = .5;
-function frame() {
-    var myItem = document.getElementById("head");
-    myItem.setAttribute("transform","translate("+x+","+y+")");
-    x += cx;
-    y += cy;
-    if(x > 550)
-        cx *= -1.;
-    if(y > 450)
-        cy *= -1.;
-    if(x < 50)
-        cx *= -1.;
-    if(y < 50)
-        cy *= -1.;
-}
-setInterval(frame, 1/60);
+
         </script>
     </body>
 </html>
