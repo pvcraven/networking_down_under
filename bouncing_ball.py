@@ -8,31 +8,39 @@ SCREEN_TITLE = "Networked Bouncing Balls"
 
 BUFFER_SIZE = 65536
 
-# Listen to the listed listed address and port for incoming
-# balls. Set to None if we aren't listening.
-listen_right = ('127.0.0.1', 10001)
-listen_left = ('127.0.0.1', 10002)
+# Left or right computer?
+m = "left"
 
-# Try to send the ball to the address and port if it
-# hits the edge. Set to None if it doesn't go anywhere.
-send_left = ('127.0.0.1', 10003)
-send_right = None
 
-# listen_right = ('127.0.0.1', 10003)
-# listen_left = ('127.0.0.1', 10004)
-# send_left = None
-# send_right = ('127.0.0.1', 10002)
+if m == "right":
+    # Listen to the listed listed address and port for incoming
+    # balls. Set to None if we aren't listening.
+    listen_right = None
+    listen_left = ('127.0.0.1', 10001)
+
+    # Try to send the ball to the address and port if it
+    # hits the edge. Set to None if it doesn't go anywhere.
+    send_left = ('127.0.0.1', 10002)
+    send_right = None
+else:
+    listen_right = ('127.0.0.1', 10002)
+    listen_left = None
+    send_left = None
+    send_right = ('127.0.0.1', 10001)
+
 
 # Set up the sockets for receiving data
-left_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-left_socket.settimeout(0.0)
-left_socket.bind(listen_left)
-left_socket.listen(1)
+if listen_left:
+    left_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    left_socket.settimeout(0.0)
+    left_socket.bind(listen_left)
+    left_socket.listen(1)
 
-right_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-right_socket.settimeout(0.0)
-right_socket.bind(listen_right)
-right_socket.listen(1)
+if listen_right:
+    right_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    right_socket.settimeout(0.0)
+    right_socket.bind(listen_right)
+    right_socket.listen(1)
 
 
 class Ball:
@@ -59,7 +67,7 @@ class MyGame(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title, resizable=True)
 
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.LIGHT_GRAY)
         self.ball_list = []
 
     def create_ball(self):
@@ -67,7 +75,8 @@ class MyGame(arcade.Window):
         ball = Ball()
 
         # Create a random color, radius, and position
-        ball.color = (random.randrange(256), random.randrange(256), random.randrange(256))
+        # ball.color = (random.randrange(256), random.randrange(256), random.randrange(256))
+        ball.color = (0, 0, 0)
         ball.radius = random.randrange(20, 41)
         ball.center_x = random.randrange(self.width)
         ball.center_y = random.randrange(self.height)
@@ -160,6 +169,7 @@ class MyGame(arcade.Window):
                     ball.change_x *= -1
                 else:
                     try:
+                        print("Send left")
                         self.send_ball(ball, send_left)
                     except:
                         ball.change_x *= -1
@@ -170,6 +180,7 @@ class MyGame(arcade.Window):
                     ball.change_x *= -1
                 else:
                     try:
+                        print("Send right")
                         self.send_ball(ball, send_right)
                     except:
                         ball.change_x *= -1
@@ -181,23 +192,42 @@ class MyGame(arcade.Window):
                 ball.change_y *= -1
 
         # See if we have any incoming balls from the left
-        ball = self.receive_ball(left_socket)
-        if ball:
-            ball.center_x = 0
-            self.ball_list.append(ball)
+        if listen_left:
+            ball = self.receive_ball(left_socket)
+            if ball:
+                print("Receive left")
+                ball.center_x = 0
+                self.ball_list.append(ball)
 
         # See if we have any incoming balls from the right
-        ball = self.receive_ball(right_socket)
-        if ball:
-            ball.center_x = self.width
-            self.ball_list.append(ball)
+        if listen_right:
+            ball = self.receive_ball(right_socket)
+            if ball:
+                print("Receive right")
+                ball.center_x = self.width
+                self.ball_list.append(ball)
 
     def on_key_press(self, key, key_modifiers):
         """ Called whenever a key on the keyboard is pressed. """
+        
+        # Spawn a new ball with a space
         if key == arcade.key.SPACE:
             ball = self.create_ball()
             self.ball_list.append(ball)
 
+        # Quit with a Q
+        if key == arcade.key.Q:
+            exit()
+
+        # Flip between full/windowed with F
+        if key == arcade.key.F:
+            # User hits s. Flip between full and not full screen.
+            self.set_fullscreen(not self.fullscreen)
+
+            # Instead of a one-to-one mapping, stretch/squash window to match the
+            # constants. This does NOT respect aspect ratio. You'd need to
+            # do a bit of math for that.
+            self.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
 def main():
     """ Main method """
