@@ -1,11 +1,10 @@
 import socket
 from timeit import default_timer as timer
 
-BUFFER_SIZE = 65535
-
 # Receive info
 my_ip_address = '127.0.0.1'
 my_ip_port = 10000
+BUFFER_SIZE = 65536
 
 # We need to build a "state machine" that keeps
 # track of if we are connected or not
@@ -80,18 +79,17 @@ class MyConnectionHandler:
                     # Append this chunk to the full message
                     full_message += data
 
-                    # See if last letter is Z or Y. If so, close socket.
+                    # See if last letter is a \n or 'Y'. If so, close socket.
+                    # 'Y' signifies end of this 'chunk', a '\n' signifies end of
+                    # the entire message.
                     last_letter = full_message[-1]
-                    if last_letter == 90 or last_letter == 89:
+                    if last_letter == 10 or last_letter == 89:
                         # Close the socket. No socket operations can happen after this.
                         self.state = NO_CONNECTION
                         connection.close()
                         print(f"Closing connection, total of {len(full_message)} bytes received.")
 
-                        # Check for a Z instead of an X. This means that we have the
-                        # last packet, and we are done.
-                        if last_letter == 90:
-
+                        if last_letter == 10:
                             # Stop timing how long this takes.
                             total_time = timer() - start_time
                             done = True

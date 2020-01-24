@@ -29,7 +29,7 @@ def send_data(total_bytes, message_size_in_bytes):
         my_socket.sendall(my_message)
 
     # Send a message signaling we are done sending packets.
-    my_socket.sendall(b"Z")
+    my_socket.sendall(b"\n")
 
     # Close the socket
     my_socket.close()
@@ -43,7 +43,7 @@ def main():
     total_bytes = 5000
 
     # How big each message will be
-    message_size_in_bytes = 100
+    message_size_in_bytes = 10
     print(f"Sending {total_bytes:,} bytes in {message_size_in_bytes} byte chunks.")
     send_data(total_bytes, message_size_in_bytes)
 

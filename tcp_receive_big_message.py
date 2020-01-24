@@ -20,15 +20,27 @@ my_ip_port = 10000
 # check again.
 DELAY = 0.1
 
-# Our full message. Starts empty.
-full_message = b""
-
 # We need to build a "state machine" that keeps
 # track of if we are connected or not
 NO_CONNECTION = 1
 CONNECTED = 2
 
 state = NO_CONNECTION
+
+# Our full message. Starts empty.
+full_message = b""
+
+# We will keep receiving data until we get a \n. Once we see that, we'll set
+# done to true.
+done = False
+
+# Keep track of how many chunks of data we receive.
+chunks = 0
+
+connection = None
+client_ip = None
+client_port = None
+
 
 # Create a socket for sending/receiving data
 my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,12 +57,6 @@ my_socket.bind(listen_to)
 # The "1" specifies the size of the backlog of connections we allow before
 # refusing connections.
 my_socket.listen(1)
-
-done = False
-chunks = 0
-connection = None
-client_ip = None
-client_port = None
 
 while not done:
 

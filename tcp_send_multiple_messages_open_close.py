@@ -13,9 +13,7 @@ def send_data(total_bytes, message_size_in_bytes):
     messages_to_send = total_bytes // message_size_in_bytes
 
     # Message as a byte array. (Hence the b at the front.)
-    # Send byte array with an X:   b"X"
-    # Repeat this (message_size_in_bytes - 1) times.
-    # Pop a \n at the end.
+    # Put a Y at the end of each chunk, a \n at end-of-message.
     my_message = b"X" * (message_size_in_bytes - 1) + b"Y"
 
     # Repeat, and send our message over and over.
@@ -31,16 +29,11 @@ def send_data(total_bytes, message_size_in_bytes):
 
         if(i == messages_to_send - 1):
             # Send a message signaling we are done sending packets.
-            my_socket.sendall(b"Z")
+            my_socket.sendall(b"\n")
 
         # Close the socket
         my_socket.close()
 
-
-    # Close the socket
-    my_socket.close()
-
-    print("Done")
 
 def main():
     """ Main program. """
@@ -52,5 +45,6 @@ def main():
     message_size_in_bytes = 100
     print(f"Sending {total_bytes:,} bytes in {message_size_in_bytes} byte chunks.")
     send_data(total_bytes, message_size_in_bytes)
+    print("Done")
 
 main()
