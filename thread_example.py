@@ -11,8 +11,7 @@ class MyThread(threading.Thread):
         Constructor. Get stuff set up, set variables.
         """
         super().__init__()
-        # thread_no is just a label so we can see what thread is actually
-        # printing.
+        # thread_no is a label so we can track which thread is printing.
         self.thread_no = thread_no
 
     def run(self):
