@@ -10,7 +10,6 @@ https://blog.macuyiko.com/post/2016/how-to-send-html-mails-with-oauth2-and-gmail
 """
 
 import base64
-import imaplib
 import json
 import smtplib
 import urllib.parse
@@ -35,16 +34,13 @@ GOOGLE_REFRESH_TOKEN = None
 FROM_ADDRESS = '<PUT YOUR ACCOUNT E_MAIL HERE>'
 TO_ADDRESS = '<PUT DESTINATION ACCOUNT HERE>'
 
+
 def command_to_url(command):
     return '%s/%s' % (GOOGLE_ACCOUNTS_BASE_URL, command)
 
 
 def url_escape(text):
     return urllib.parse.quote(text, safe='~-._')
-
-
-def url_unescape(text):
-    return urllib.parse.unquote(text)
 
 
 def url_format_params(params):
@@ -63,48 +59,33 @@ def generate_permission_url(client_id, scope='https://mail.google.com/'):
 
 
 def call_authorize_tokens(client_id, client_secret, authorization_code):
-    params = {}
-    params['client_id'] = client_id
-    params['client_secret'] = client_secret
-    params['code'] = authorization_code
-    params['redirect_uri'] = REDIRECT_URI
-    params['grant_type'] = 'authorization_code'
+    params = {'client_id': client_id,
+              'client_secret': client_secret,
+              'code': authorization_code,
+              'redirect_uri': REDIRECT_URI,
+              'grant_type': 'authorization_code'}
     request_url = command_to_url('o/oauth2/token')
-    response = urllib.request.urlopen(request_url, urllib.parse.urlencode(params).encode('UTF-8')).read().decode('UTF-8')
+    response = urllib.request.urlopen(request_url,
+                                      urllib.parse.urlencode(params).encode('UTF-8')).read().decode('UTF-8')
     return json.loads(response)
 
 
-def call_refresh_token(client_id, client_secret, refresh_token):
-    params = {}
-    params['client_id'] = client_id
-    params['client_secret'] = client_secret
-    params['refresh_token'] = refresh_token
-    params['grant_type'] = 'refresh_token'
+def call_refresh_token(client_id, client_secret, my_refresh_token):
+    params = {'client_id': client_id,
+              'client_secret': client_secret,
+              'refresh_token': my_refresh_token,
+              'grant_type': 'refresh_token'}
     request_url = command_to_url('o/oauth2/token')
-    response = urllib.request.urlopen(request_url, urllib.parse.urlencode(params).encode('UTF-8')).read().decode('UTF-8')
+    response = urllib.request.urlopen(request_url,
+                                      urllib.parse.urlencode(params).encode('UTF-8')).read().decode('UTF-8')
     return json.loads(response)
 
 
-def generate_oauth2_string(username, access_token, as_base64=False):
-    auth_string = 'user=%s\1auth=Bearer %s\1\1' % (username, access_token)
+def generate_oauth2_string(username, my_access_token, as_base64=False):
+    auth_string = 'user=%s\1auth=Bearer %s\1\1' % (username, my_access_token)
     if as_base64:
         auth_string = base64.b64encode(auth_string.encode('ascii')).decode('ascii')
     return auth_string
-
-
-def test_imap(user, auth_string):
-    imap_conn = imaplib.IMAP4_SSL('imap.gmail.com')
-    imap_conn.debug = 4
-    imap_conn.authenticate('XOAUTH2', lambda x: auth_string)
-    imap_conn.select('INBOX')
-
-
-def test_smpt(user, base64_auth_string):
-    smtp_conn = smtplib.SMTP('smtp.gmail.com', 587)
-    smtp_conn.set_debuglevel(True)
-    smtp_conn.ehlo('test')
-    smtp_conn.starttls()
-    smtp_conn.docmd('AUTH', 'XOAUTH2 ' + base64_auth_string)
 
 
 def get_authorization(google_client_id, google_client_secret):
@@ -115,14 +96,14 @@ def get_authorization(google_client_id, google_client_secret):
     return response['refresh_token'], response['access_token'], response['expires_in']
 
 
-def refresh_authorization(google_client_id, google_client_secret, refresh_token):
-    response = call_refresh_token(google_client_id, google_client_secret, refresh_token)
+def refresh_authorization(google_client_id, google_client_secret, my_refresh_token):
+    response = call_refresh_token(google_client_id, google_client_secret, my_refresh_token)
     return response['access_token'], response['expires_in']
 
 
 def send_mail(fromaddr, toaddr, subject, message):
-    access_token, expires_in = refresh_authorization(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN)
-    auth_string = generate_oauth2_string(fromaddr, access_token, as_base64=True)
+    my_access_token, my_expires_in = refresh_authorization(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN)
+    auth_string = generate_oauth2_string(fromaddr, my_access_token, as_base64=True)
 
     msg = MIMEMultipart('related')
     msg['Subject'] = subject
