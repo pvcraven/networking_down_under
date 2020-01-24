@@ -23,7 +23,7 @@ REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
 # You can get API credentials from:
 # https://console.developers.google.com/?pli=1
-GOOGLE_CLIENT_ID = '<PUT AUTH2 CLIENT ID HERE>'
+GOOGLE_CLIENT_ID = '<PUT OAUTH2 CLIENT ID HERE>'
 GOOGLE_CLIENT_SECRET = '<PUT CLIENT SECRET HERE>'
 
 # Once you get the API setup, run this file. It will give you a web address to
