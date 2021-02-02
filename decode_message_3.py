@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 CLOCK_CHANNEL = 16
 DATA_CHANNEL = 23
 
+
 # This is a callback function that will be called whenever we have a high/low
 # or low/high change in the signal.
 def my_callback(channel):
@@ -19,6 +20,7 @@ def my_callback(channel):
         print(" = {} = {}".format(my_callback.result_byte, chr(my_callback.result_byte)))
         my_callback.counter = 0
         my_callback.result_byte = 0
+
 
 my_callback.counter = 0
 my_callback.result_byte = 0
