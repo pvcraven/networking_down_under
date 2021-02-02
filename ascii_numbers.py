@@ -7,9 +7,9 @@ format.
 line_height = 7
 
 # List of characters
-letters = []
+characters = []
 
-letter = """
+character = """
  ### 
 #   #
 #   #
@@ -18,9 +18,9 @@ letter = """
 #   #
  ### 
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
  # 
 ## 
  # 
@@ -29,9 +29,9 @@ letter = """
  # 
 ###
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
  ### 
 #   #
     #
@@ -40,9 +40,9 @@ letter = """
  #   
 #####
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
  ### 
 #   #
     #
@@ -51,9 +51,9 @@ letter = """
 #   #
  ### 
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
 #   # 
 #   # 
 #   # 
@@ -62,9 +62,9 @@ letter = """
     # 
     # 
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
 #####
 #    
 #    
@@ -73,9 +73,9 @@ letter = """
     #
 #### 
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
  ### 
 #   #
 #    
@@ -84,9 +84,9 @@ letter = """
 #   #
  ### 
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
 #####
     #
     #
@@ -95,9 +95,9 @@ letter = """
  #   
 #    
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
  ### 
 #   #
 #   #
@@ -106,9 +106,9 @@ letter = """
 #   #
  ### 
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
  ### 
 #   #
 #   #
@@ -117,9 +117,9 @@ letter = """
 #   #
  ### 
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
-letter = """
+character = """
   
   
   
@@ -128,11 +128,10 @@ letter = """
 ##
 ##
 """
-letters.append(letter.split("\n"))
+characters.append(character.split("\n"))
 
 # Create a mapping of character letters, to letters in our list
 mapping_characters = "0123456789."
-mapping_indexes = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 
 
 def print_string(input_string: str):
@@ -144,18 +143,14 @@ def print_string(input_string: str):
 
     # Create a list that, instead of the string, has the index locations
     # of our banner characters. So instead of "1.2" we have [1, 10, 2]
-    index_locations = []
-    for character in input_string:
-        if character in mapping_characters:
-            my_index = mapping_characters.index(character)
-            index_locations.append(my_index)
+    index_locations = [mapping_characters.index(character) for character in input_string]
 
     # Now loop through each line
     for line_no in range(1, line_height + 1):
         # Loop though each index location to print
-        for character in index_locations:
+        for index_location in index_locations:
             # Print that line of the character
-            print(letters[character][line_no], end="  ")
+            print(characters[index_location][line_no], end="  ")
         # Go to the next line
         print()
 
