@@ -64,7 +64,7 @@ data_callback.data_bit = False
 data_callback.last_call = time.time()
 # Current bit we are on
 data_callback.bit_count = 7
-# Current byte, with all 9 bits
+# Current byte, with all 8 bits
 data_callback.my_byte = 0
 
 GPIO.setmode(GPIO.BCM)
