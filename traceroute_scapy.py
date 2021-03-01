@@ -2,11 +2,12 @@
 Perform a traceroute using scapy
 and create a graph from it.
 """
-from scapy.all import *
+
+from scapy.layers.inet import traceroute
 
 # List of websites to trace
-site_list = ["google.com", 
-             "youtube.com", 
+site_list = ["google.com",
+             "youtube.com",
              "wikipedia.org"]
 
 # Max number of hops to trace
