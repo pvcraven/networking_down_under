@@ -4,6 +4,7 @@ import socket
 server_ip_address = '127.0.0.1'
 server_ip_port = 10000
 
+
 def send_data(total_bytes, message_size_in_bytes):
     """
     Send a bunch of messages that sum "total_bytes" of data. Break each
@@ -15,7 +16,7 @@ def send_data(total_bytes, message_size_in_bytes):
     # Message as a byte array. (Hence the b at the front.)
     # Send byte array with an X:   b"X"
     # Repeat this (message_size_in_bytes - 1) times.
-    my_message = b"X" * (message_size_in_bytes)
+    my_message = b"X" * (message_size_in_bytes - 1)
 
     # Open a socket
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,6 +37,7 @@ def send_data(total_bytes, message_size_in_bytes):
 
     print("Done")
 
+
 def main():
     """ Main program. """
 
@@ -46,5 +48,6 @@ def main():
     message_size_in_bytes = 10
     print(f"Sending {total_bytes:,} bytes in {message_size_in_bytes} byte chunks.")
     send_data(total_bytes, message_size_in_bytes)
+
 
 main()

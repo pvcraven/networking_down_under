@@ -15,12 +15,16 @@ import java.nio.channels.Selector;
 public class ReceiveMultipleMessages {
 
     public static void handleConnection() throws Exception {
+        // Modify this to match the computer you are connecting to
+        String ipAddress = "127.0.0.1";
+        int port = 10000;
+
         // Selector: multiplexor of SelectableChannel objects
         Selector channelSelector = Selector.open(); // selector is open here
 
         // ServerSocketChannel: selectable channel for stream-oriented listening sockets
         ServerSocketChannel myServerSocketChannel = ServerSocketChannel.open();
-        InetSocketAddress myAddress = new InetSocketAddress("127.0.0.1", 10000);
+        InetSocketAddress myAddress = new InetSocketAddress(ipAddress, port);
 
         // Binds the channel's socket to a local address and configures the socket to listen for connections
         myServerSocketChannel.bind(myAddress);
@@ -82,7 +86,7 @@ public class ReceiveMultipleMessages {
                     // System.out.println("Message received: " + result);
                     chunks += 1;
 
-                    if (result.endsWith("Z")) {
+                    if (result.endsWith("\n")) {
                         myClient.close();
                         myServerSocketChannel.close();
                         channelSelector.close();
