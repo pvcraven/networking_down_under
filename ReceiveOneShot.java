@@ -40,8 +40,9 @@ public class ReceiveOneShot {
         System.out.println("\nStarting...");
 
     }
-    public void checkConnection() throws Exception {
-
+    public boolean checkConnection() throws Exception {
+        // Set to true when we have our whole message
+        boolean done = false;
 
         // Selects a set of keys whose corresponding channels are ready for I/O operations
         // For blocking I/O use a select with no data:
@@ -72,29 +73,33 @@ public class ReceiveOneShot {
                 // Tests whether this key's channel is ready for reading
             } else if (myKey.isReadable()) {
 
-                SocketChannel myClient = (SocketChannel) myKey.channel();
-                ByteBuffer myBuffer = ByteBuffer.allocate(2048);
-                myClient.read(myBuffer);
-                String result = new String(myBuffer.array()).trim();
+                    SocketChannel myClient = (SocketChannel) myKey.channel();
+                    ByteBuffer myBuffer = ByteBuffer.allocate(65536);
+                    int bytesRead = myClient.read(myBuffer);
+                    String result = new String(myBuffer.array());
+                    result = result.substring(0, bytesRead);
+                    if (result.length() > 0) {
+                        System.out.println("Message received " + result.length() + " bytes: \"" + result + "\"");
+                    }
 
-                System.out.println("Message received: " + result);
-
-                if (result.endsWith("Z")) {
+                if (result.endsWith("\n")) {
                     myClient.close();
-                    myServerSocketChannel.close();
-//                    channelSelector.close();
+                    done = true;
                     System.out.println("It's time to close connection as we got a Z");
                 }
             }
             keyIterator.remove();
         }
+        return done;
     }
 
     public static void main(String[] args) throws Exception {
         ReceiveOneShot receiveOneShot = new ReceiveOneShot();
 
         receiveOneShot.setupSocket();
-        while(true)
-            receiveOneShot.checkConnection();
+
+        boolean done = false;
+        while(!done)
+            done = receiveOneShot.checkConnection();
     }
 }

@@ -78,26 +78,28 @@ public class ReceiveMultipleMessages {
                 } else if (myKey.isReadable()) {
 
                     SocketChannel myClient = (SocketChannel) myKey.channel();
-                    ByteBuffer myBuffer = ByteBuffer.allocate(2048);
-                    myClient.read(myBuffer);
-                    String result = new String(myBuffer.array()).trim();
-                    fullMessage = fullMessage + result;
-
-                    // System.out.println("Message received: " + result);
-                    chunks += 1;
+                    ByteBuffer myBuffer = ByteBuffer.allocate(65536);
+                    int bytesRead = myClient.read(myBuffer);
+                    String result = new String(myBuffer.array());
+                    result = result.substring(0, bytesRead);
+                    if (result.length() > 0) {
+                        fullMessage = fullMessage + result;
+                        chunks += 1;
+                        System.out.println("Message received " + result.length() + " bytes: \"" + result + "\"");
+                    }
 
                     if (result.endsWith("\n")) {
                         myClient.close();
-                        myServerSocketChannel.close();
-                        channelSelector.close();
                         done = true;
-                        System.out.println("It's time to close connection as we got a Z");
+                        System.out.println("It's time to close connection as we got a \\n");
                         endTime = System.currentTimeMillis();
                     }
                 }
                 keyIterator.remove();
             }
         }
+        myServerSocketChannel.close();
+        channelSelector.close();
         long totalTime = endTime - startTime;
         System.out.println("Done receiving " + fullMessage.length() + " in " + chunks + " chunks over " + totalTime + " ms.");
     }
