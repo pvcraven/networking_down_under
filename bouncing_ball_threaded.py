@@ -10,13 +10,15 @@ modify the addresses/ports accordingly.
 Requires "Arcade" library (which doesn't run on Raspberry Pi.)
 
 Run with:
-python bouncing_ball.py left
+python bouncing_ball_threaded.py left
 
 """
 import arcade
 import random
 import socket
 import sys
+import threading
+import time
 
 INITIAL_SCREEN_WIDTH = 800
 INITIAL_SCREEN_HEIGHT = 600
@@ -35,9 +37,14 @@ class Ball:
         self.radius = 0
         self.color = None
 
+        # Set to 'True' if we are trying to send this ball out
+        self.sending = False
+
     def move(self):
-        self.center_x += self.change_x
-        self.center_y += self.change_y
+        # Only move the ball if it isn't in the middle of being sent
+        if not self.sending:
+            self.center_x += self.change_x
+            self.center_y += self.change_y
 
     def draw(self):
         arcade.draw_circle_filled(self.center_x, self.center_y,
@@ -74,6 +81,8 @@ class MyGame(arcade.Window):
         # Socket info, as we need to keep the incoming connections open.
         self.left_socket = None
         self.right_socket = None
+        self.thread_left = None
+        self.thread_right = None
 
         # Set up the sockets for receiving data
         if listen_left:
@@ -82,6 +91,8 @@ class MyGame(arcade.Window):
             self.left_socket.settimeout(0.0)
             self.left_socket.bind(listen_left)
             self.left_socket.listen(1)
+            self.thread_left = ReceiveThread(self, self.left_socket, "left")
+            self.thread_left.start()
 
         if listen_right:
             print("Opening socked to listen for incoming balls from the RIGHT.")
@@ -89,6 +100,8 @@ class MyGame(arcade.Window):
             self.right_socket.settimeout(0.0)
             self.right_socket.bind(listen_right)
             self.right_socket.listen(1)
+            self.thread_right = ReceiveThread(self, self.right_socket, "right")
+            self.thread_right.start()
 
     def create_ball(self):
         """ Create a random ball on the screen. """
@@ -117,7 +130,9 @@ class MyGame(arcade.Window):
         for ball in self.ball_list:
             ball.draw()
 
-    def send_ball(self, ball, connection_info):
+    def send_ball(self,
+                  ball: Ball,
+                  connection_info: (int, int)):
         """ Make a network call to send the ball out over the network."""
 
         # Create the message
@@ -190,7 +205,9 @@ class MyGame(arcade.Window):
             ball.move()
 
             # Ball hits left side of the screen
-            if ball.change_x < 0 and ball.center_x - ball.radius < 0:
+            if ball.change_x < 0 \
+                    and ball.center_x - ball.radius < 0 \
+                    and not ball.sending:
 
                 # Do we have a computer  to send the ball to?
                 if self.send_left is None:
@@ -198,16 +215,15 @@ class MyGame(arcade.Window):
                     ball.change_x *= -1
                 else:
                     # Yes, try to send it
-                    try:
-                        print("Send left")
-                        self.send_ball(ball, self.send_left)
-                    except IOError:
-                        # Yes, try to send it
-                        ball.change_x *= -1
-                        print("Failed to send")
+                    print("Send left")
+                    ball.sending = True
+                    thread = SendThread(self, ball, self.send_left)
+                    thread.start()
 
             # Ball hits right side of the screen
-            if ball.change_x > 0 and ball.center_x + ball.radius > self.width:
+            if ball.change_x > 0 \
+                    and ball.center_x + ball.radius > self.width\
+                    and not ball.sending:
 
                 # Do we have a computer  to send the ball to?
                 if self.send_right is None:
@@ -215,13 +231,11 @@ class MyGame(arcade.Window):
                     ball.change_x *= -1
                 else:
                     # Yes, try to send it
-                    try:
-                        print("Send right")
-                        self.send_ball(ball, self.send_right)
-                    except IOError:
-                        # Yes, try to send it
-                        ball.change_x *= -1
-                        print("Failed to send")
+                    print("Send right")
+                    ball.sending = True
+                    thread = SendThread(self, ball, self.send_right)
+                    thread.start()
+
 
             # Ball hits bottom of screen, bounce
             if ball.change_y < 0 and ball.center_y - ball.radius < 0:
@@ -230,22 +244,6 @@ class MyGame(arcade.Window):
             # Ball hits top of screen, bounce
             if ball.change_y > 0 and ball.center_y + ball.radius > self.height:
                 ball.change_y *= -1
-
-        # See if we have any incoming balls from the left
-        if self.listen_left:
-            ball = self.receive_ball(self.left_socket)
-            if ball:
-                print("Receive left")
-                ball.center_x = 0
-                self.ball_list.append(ball)
-
-        # See if we have any incoming balls from the right
-        if self.listen_right:
-            ball = self.receive_ball(self.right_socket)
-            if ball:
-                print("Receive right")
-                ball.center_x = self.width
-                self.ball_list.append(ball)
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -270,6 +268,75 @@ class MyGame(arcade.Window):
             # constants. This does NOT respect aspect ratio. You'd need to
             # do a bit of math for that.
             self.set_viewport(0, self.screen.width, 0, self.screen.height)
+
+
+class ReceiveThread(threading.Thread):
+    """
+    This class will manage a thread.
+    """
+
+    def __init__(self,
+                 game: MyGame,
+                 socket,
+                 side: str):
+        """
+        Constructor. Get stuff set up, set variables.
+        """
+        super().__init__()
+        # thread_no is a label so we can track which thread is printing.
+        self.game = game
+        self.socket = socket
+        self.keep_running = True
+        self.side = side
+
+    def run(self):
+        """
+        This method will be run concurrently as a separate thread.
+        """
+
+        # Loop and pause a bit between each loop
+        while self.keep_running:
+            ball = self.game.receive_ball(self.socket)
+
+            if ball:
+                print(f"Receive {self.side}.")
+                if self.side == "right":
+                    ball.center_x = self.game.width
+                    print(f"Ball's x: {ball.center_x}")
+                if self.side == "left":
+                    ball.center_x = 0
+                self.game.ball_list.append(ball)
+
+            time.sleep(0.1)
+
+        print("Shutting down receiving thread.")
+
+class SendThread(threading.Thread):
+    """
+    This class will manage a thread.
+    """
+
+    def __init__(self, game: MyGame, ball, info):
+        """
+        Constructor. Get stuff set up, set variables.
+        """
+        super().__init__()
+
+        self.game = game
+        self.info = info
+        self.ball = ball
+
+    def run(self):
+        """
+        This method will be run concurrently as a separate thread.
+        """
+        try:
+            print("Send")
+            self.game.send_ball(self.ball, self.info)
+        except:
+            self.ball.change_x *= -1
+            self.ball.sending = False
+            print("Failed to send")
 
 
 def main():
@@ -316,22 +383,29 @@ def main():
         listen_left = None
 
         right_computer_address = '127.0.0.1'
-        right_computer_port = 10002
+        right_computer_port = 10001
         send_right = (right_computer_address, right_computer_port)
 
         send_left = None
 
     # Create the game object
-    MyGame(INITIAL_SCREEN_WIDTH,
-           INITIAL_SCREEN_HEIGHT,
-           SCREEN_TITLE,
-           send_left,
-           send_right,
-           listen_left,
-           listen_right)
+    game_object = MyGame(INITIAL_SCREEN_WIDTH,
+                  INITIAL_SCREEN_HEIGHT,
+                  SCREEN_TITLE,
+                  send_left,
+                  send_right,
+                  listen_left,
+                  listen_right)
 
     # Run the game
     arcade.run()
+
+    # Shut down any listening threads
+    if game_object.thread_left:
+        game_object.thread_left.keep_running = False
+
+    if game_object.thread_right:
+        game_object.thread_right.keep_running = False
 
 
 if __name__ == "__main__":

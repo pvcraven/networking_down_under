@@ -3,3 +3,4 @@ venv/
 *.class
 *.sublime-project
 *.sublime-workspace
+*.svg
