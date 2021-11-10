@@ -21,4 +21,4 @@ for bit_pos in range(bits_to_encode):
     else:
         bit_value = 0
 
-    print("Bit position {:2} is {} which is worth {:2}".format(bit_pos, bit_value, bit))
+    print(f"Bit position {bit_pos:2} is {bit_value} which is worth {bit:2}.")

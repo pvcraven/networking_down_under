@@ -7,9 +7,9 @@ CLOCK_CHANNEL = 12
 # or low/high change in the signal.
 def my_callback(channel):
     if GPIO.input(channel):
-        print("Channel {} is high".format(channel))
+        print(f"Channel {channel} is high.")
     else:
-        print("Channel {} is low".format(channel))
+        print(f"Channel {channel} is low.")
 
 # Set pin 12 up for input
 GPIO.setmode(GPIO.BCM)

@@ -22,7 +22,7 @@ my_message = b'Hello World'
 for my_byte in my_message:
 
     # Show what we are encoding
-    print("{} = {:3} = ".format(chr(my_byte), my_byte), end="")
+    print(f"{chr(my_byte)} = {my_byte:3} = ", end="")
 
     # Loop for each bit of the byte, starting with the most
     # significant bit 7, down to 0.
@@ -41,12 +41,8 @@ for my_byte in my_message:
         # &      = 0100 0000 = 64 (result of bit-wise 'and')
         bit = (1 << bit_pos) & my_byte
 
-        if bit != 0:
-            # There was a value
-            bit_value = 1
-        else:
-            # There was not a value
-            bit_value = 0
+        # Make sure bit_value is a 1 or 0, not some power of 2.
+        bit_value = 0 if bit == 0 else 1
 
         print(bit_value, end="")
 
