@@ -68,7 +68,7 @@ for my_byte in my_message:
             time.sleep(CLOCK_SPEED)
 
     # print(bit, end="")
-    print(" - {:3} - {:}".format(my_byte, chr(my_byte)))
+    print(f" - {my_byte:3} - {chr(my_byte)}")
 
 time.sleep(CLOCK_SPEED * 4)
 GPIO.cleanup()
