@@ -21,7 +21,7 @@
 #include <netinet/ether.h>
 #include <unistd.h>
 
-/* Replace the bytes below with the MAC address
+/* ALERT: Replace the bytes below with the MAC address
    you are sending to.
    So if 'ifconfig' on the RECEIVER (not the sender) says:
    wlan0     Link encap:Ethernet  HWaddr b8:27:eb:44:08:62
@@ -41,7 +41,10 @@
 #define DEST_MAC4    0x08
 #define DEST_MAC5    0x62
 
+/* ALERT: Update the field below to specify what network 
+  adapter should we send data through. */
 #define DEFAULT_IF  "wlan0"
+
 #define BUF_SIZ     1024
 
 int main(int argc, char *argv[])
@@ -111,7 +114,7 @@ int main(int argc, char *argv[])
         sendbuf[tx_len++] = 0x00;
 
         /*
-        Packet data
+        UPDATE: Packet data
         This is the 'payload'. Replace this with your real data.
         Because you'll probably have more interesting things to send
         than the hex 0xDEAD 0xBEEF
