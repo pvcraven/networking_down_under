@@ -22,5 +22,8 @@ s.bind((listen_ip_address, listen_ip_port))
 
 while True:
     # Receive our data
-    data, source_address = s.recvfrom(buffer_size)
-    print("From {}:{}: {}".format(source_address[0], source_address[1], data))
+    data, source = s.recvfrom(buffer_size)
+    # "source" is a list of two items, the IP and the port.
+    # Unpack the source into separate values.
+    source_address, source_port = source
+    print(f"From {source_address}:{source_port}: {data}")
