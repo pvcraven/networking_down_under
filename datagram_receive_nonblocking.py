@@ -26,8 +26,11 @@ s.setblocking(0)
 while True:
     try:
         # Receive our data
-        data, source_address = s.recvfrom(buffer_size)
-        print("From {}:{}: {}".format(source_address[0], source_address[1], data))
+        data, source = s.recvfrom(buffer_size)
+        # "source" is a list of two items, the IP and the port.
+        # Unpack the source into separate values.
+        source_address, source_port = source
+        print(f"From {source_address}:{source_port}: {data}")
 
     except BlockingIOError:
         # We didn't get any data. Wait and then try again
