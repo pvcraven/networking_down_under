@@ -18,7 +18,7 @@ def data_callback(channel):
     cur_time = time.time()
     time_interval = cur_time - data_callback.last_call
 
-    dl = "L->H" if data_line else "H->L"
+    dl = "low->high" if data_line else "high->low"
     print(f"  Change: {dl} Interval: {time_interval:.3f}")
 
     data_callback.last_call = cur_time
