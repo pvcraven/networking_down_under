@@ -5,6 +5,7 @@ available frokm Adafruit.
 Before you use this program, you'll need to install the 
 Adafruit library with:
 pip3 install adafruit-circuitpython-ahtx0
+pip3 install adafruit-circuitpython-ssd1306
 """
 import time
 import datetime

@@ -1,6 +1,7 @@
 """
 This prints the temp and humidity from the AHT20 sensor
 available frokm Adafruit.
+https://www.adafruit.com/product/4566
 
 Before you use this program, you'll need to install the 
 Adafruit library with:

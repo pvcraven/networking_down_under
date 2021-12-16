@@ -41,7 +41,7 @@ def setup_oled():
     return oled
 
 
-def create_image():
+def create_image(text):
     # Create blank image for drawing.
     # Make sure to create image with mode '1' for 1-bit color.
     image_size = (OLED_WIDTH, OLED_HEIGHT)
@@ -65,7 +65,6 @@ def create_image():
     font = ImageFont.load_default()
 
     # Draw Some Text
-    text = "Hello World!"
     font_width, font_height = font.getsize(text)
     position = (OLED_WIDTH // 2 - font_width // 2, 
                 OLED_HEIGHT // 2 - font_height // 2)
@@ -84,7 +83,7 @@ def main():
         print(f"Make sure it is plugged in and run 'sudo i2cdetect -y 1' to verify.")
         return
 
-    image = create_image()
+    image = create_image("Hello World!")
 
     # Display image
     oled.image(image)
