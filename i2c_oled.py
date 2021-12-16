@@ -25,11 +25,11 @@ BORDER = 5
 
 
 def setup_oled():
-    # Define the Reset Pin
-    oled_reset = digitalio.DigitalInOut(board.D4)
-
     # Set up i2c
     i2c = board.I2C()
+
+    # Define the Reset Pin
+    oled_reset = digitalio.DigitalInOut(board.D4)
 
     # Connect to device
     oled = adafruit_ssd1306.SSD1306_I2C(OLED_WIDTH, 
