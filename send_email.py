@@ -1,26 +1,22 @@
+"""
+Send e-mail using Mailtrap.
+Get a free Mailtrap account at: https://mailtrap.io/
+"""
 import smtplib
-import ssl
 
-# Note, GMail considers this a "less secure" application.
-# If you use gmail, it will not accept this e-mail until you
-# enable less secure applications on that account
-port = 465
-server_name = "smtp.gmail.com"
+sender = "Private Person <from@example.com>"
+receiver = "A Test User <to@example.com>"
 
-# Setting the debug level to 1 will output everything that is sent to,
-# or recevied from the server
-debug_level = 1
+message = f"""\
+Subject: Hi Mailtrap
+To: {receiver}
+From: {sender}
 
-username = input("Enter your username: ")
-password = input("Type your password: ")
-destination_address = input("Enter destination email address: ")
-subject = input("Enter subject line: ")
-message = input("Enter message: ")
+This is a test e-mail message."""
 
-# Create a secure SSL context
-context = ssl.create_default_context()
-
-with smtplib.SMTP_SSL(server_name, port, context=context) as server:
-    server.set_debuglevel(debug_level)
-    server.login(username, password)
-    server.sendmail(username, destination_address, message)
+with smtplib.SMTP("smtp.mailtrap.io", 2525) as server:
+    # When you sign up for Mailtrap, the service will
+    # give you a login id and password that you need
+    # to use below.
+    server.login("01234567890abcd", "01234567890abcd")
+    server.sendmail(sender, receiver, message)

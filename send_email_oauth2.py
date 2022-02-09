@@ -1,12 +1,27 @@
 """
+Send an e-mail message via your GMail account.
+
 Adapted from:
 https://github.com/google/gmail-oauth2-tools/blob/master/python/oauth2.py
 https://developers.google.com/identity/protocols/OAuth2
 https://blog.macuyiko.com/post/2016/how-to-send-html-mails-with-oauth2-and-gmail-in-python.html
 
-1. Generate and authorize an OAuth2 (generate_oauth2_token)
-2. Generate a new access tokens using a refresh token(refresh_token)
-3. Generate an OAuth2 string to use for login (access_token)
+To run:
+1.) Get client app id
+    You can get API credentials from:
+    https://console.developers.google.com/?pli=1
+    Sign up for account, select "Credentials"
+    Click "Create Credentials" at the top. Select OAuth Client ID
+    Select "Desktop App"
+    Give it a name
+    Copy/paste the values in for GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+2.) Run the app. It will give you a URL to paste into a browser and authenticate.
+3.) Once authenticated using the URL, you'll get the access token. Paste it in
+    as a string for GOOGLE_REFRESH_TOKEN.
+4.) Update the FROM_ADDRESS to the account you logged in as.
+5.) Update the TO_ADDRESS to where you want the e-mail to go.
+6.) Run the app yet again. As you have a refresh token, it will now send the e-mail
+    instead of trying to get a refresh token.
 """
 
 import base64
@@ -36,7 +51,7 @@ TO_ADDRESS = '<PUT DESTINATION ACCOUNT HERE>'
 
 
 def command_to_url(command):
-    return '%s/%s' % (GOOGLE_ACCOUNTS_BASE_URL, command)
+    return f'{GOOGLE_ACCOUNTS_BASE_URL}/{command}'
 
 
 def url_escape(text):
@@ -46,7 +61,7 @@ def url_escape(text):
 def url_format_params(params):
     param_fragments = []
     for param in sorted(params.items(), key=lambda x: x[0]):
-        param_fragments.append('%s=%s' % (param[0], url_escape(param[1])))
+        param_fragments.append(f'{param[0]}={ url_escape(param[1])}')
     return '&'.join(param_fragments)
 
 
@@ -55,7 +70,7 @@ def generate_permission_url(client_id, scope='https://mail.google.com/'):
               'redirect_uri': REDIRECT_URI,
               'scope': scope,
               'response_type': 'code'}
-    return '%s?%s' % (command_to_url('o/oauth2/auth'), url_format_params(params))
+    return f"{command_to_url('o/oauth2/auth')}?{url_format_params(params)}"
 
 
 def call_authorize_tokens(client_id, client_secret, authorization_code):
@@ -82,7 +97,7 @@ def call_refresh_token(client_id, client_secret, my_refresh_token):
 
 
 def generate_oauth2_string(username, my_access_token, as_base64=False):
-    auth_string = 'user=%s\1auth=Bearer %s\1\1' % (username, my_access_token)
+    auth_string = f'user={username}\1auth=Bearer {my_access_token}\1\1'
     if as_base64:
         auth_string = base64.b64encode(auth_string.encode('ascii')).decode('ascii')
     return auth_string
