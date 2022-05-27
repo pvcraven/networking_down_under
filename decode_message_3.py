@@ -7,8 +7,8 @@ DATA_CHANNEL = 23
 
 # This is a callback function that will be called whenever we have a high/low
 # or low/high change in the signal.
-def my_callback(channel):
-    result = GPIO.input(DATA_CHANNEL);
+def my_callback(_channel):
+    result = GPIO.input(DATA_CHANNEL)
     if result:
         print("1", end="")
         my_callback.result_byte += 1 << (7 - my_callback.counter)
@@ -17,7 +17,7 @@ def my_callback(channel):
 
     my_callback.counter += 1
     if my_callback.counter > 7:
-        print(" = {} = {}".format(my_callback.result_byte, chr(my_callback.result_byte)))
+        print(f" = {my_callback.result_byte} = {chr(my_callback.result_byte)}")
         my_callback.counter = 0
         my_callback.result_byte = 0
 

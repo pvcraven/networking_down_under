@@ -4,10 +4,11 @@ import RPi.GPIO as GPIO
 CLOCK_CHANNEL = 16
 DATA_CHANNEL = 23
 
+
 # This is a callback function that will be called whenever we have a high/low
 # or low/high change in the signal.
 def my_callback(channel):
-    result = GPIO.input(DATA_CHANNEL);
+    result = GPIO.input(DATA_CHANNEL)
     if result:
         print("1", end="")
     else:
@@ -17,6 +18,7 @@ def my_callback(channel):
     if my_callback.counter > 7:
         print()
         my_callback.counter = 0
+
 
 my_callback.counter = 0
 

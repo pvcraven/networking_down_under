@@ -28,14 +28,19 @@ VERTICAL = "\x1b(0\x78\x1bB("
 
 # Print some colored text
 print(CLEAR_SCREEN, end="")
-print("Adding colors is {}great{} to do.".format(BRIGHT_RED, RESET))
-print("This {}is in green{}.".format(GREEN, RESET))
+print(f"Adding colors is {BRIGHT_RED}great{RESET} to do.")
+print(f"This {GREEN}is in green{RESET}.")
 
-# Print a table of ANSI characters
+# Print a table of ANSI characters.
+# If you are running on Windows, these might not look right.
+# You may need to run it in Windows Terminal or some other
+# terminal program with full ANSI support.
 for i in range(0x21, 0x7e):
 	if i % 8 == 0:
 		print()
 	char = chr(i)
-	print("0x{:0x} \x1b(0{}\x1b(B".format(i, char), end="  ")
+	hex_string = f"0x{i:0x}"
+	ansi_character = f"\x1b(0{char}\x1b(B"
+	print(f"{hex_string} {ansi_character}", end="  ")
 
 print()
